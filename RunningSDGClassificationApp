@@ -1,0 +1,95 @@
+# Running the SDG Classification Flask App
+
+## Prerequisites
+Ensure you have the following installed on your system:
+- Python 3.8+
+- MySQL Server
+- Required Python libraries (listed below)
+
+## Step 1: Clone the Repository
+```sh
+git clone <repository_url>
+cd <repository_folder>
+```
+
+## Step 2: Create a Virtual Environment (Optional but Recommended)
+```sh
+python -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+```
+
+## Step 3: Install Dependencies
+```sh
+pip install -r requirements.txt
+```
+If `requirements.txt` is missing, install manually:
+```sh
+pip install os-sys requests pymupdf numpy mysql-connector-python tiktoken flask flask-cors beautifulsoup4 langchain_openai keybert
+```
+
+## Step 4: Set Up Environment Variables
+Replace `<your_openai_api_key>` with your actual OpenAI API key.
+```sh
+export OPENAI_API_KEY="<your_openai_api_key>"  # On Windows use: set OPENAI_API_KEY=<your_openai_api_key>
+```
+
+## Step 5: Configure MySQL Database
+1. Ensure MySQL is running.
+2. Create the required database and table:
+```sql
+CREATE DATABASE sdg_tracking;
+USE sdg_tracking;
+CREATE TABLE sdg_results (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    text TEXT,
+    keywords TEXT,
+    sdg_classification TEXT
+);
+```
+3. Update MySQL credentials in the `conn` object in the Python script.
+
+## Step 6: Run the Flask App
+```sh
+python app.py
+```
+The API should now be running on `http://127.0.0.1:5000/`.
+
+## Step 7: API Usage
+### 1. Extract Text from a Webpage
+```sh
+curl -X POST http://127.0.0.1:5000/scrape -H "Content-Type: application/json" -d '{"url": "<website_url>"}'
+```
+
+### 2. Classify Text for SDGs
+```sh
+curl -X POST http://127.0.0.1:5000/classify -H "Content-Type: application/json" -d '{"text": "Sample text to classify"}'
+```
+
+### 3. Extract Keywords
+```sh
+curl -X POST http://127.0.0.1:5000/extract_keywords -H "Content-Type: application/json" -d '{"text": "Sample text"}'
+```
+
+### 4. Store Classification in Database
+```sh
+curl -X POST http://127.0.0.1:5000/store_classification -H "Content-Type: application/json" -d '{"text": "Sample text", "keywords": ["keyword1", "keyword2"], "sdg_result": "SDG classification result"}'
+```
+
+### 5. Retrieve Stored Classifications
+```sh
+curl -X GET http://127.0.0.1:5000/retrieve_classifications
+```
+
+## Step 8: Using the Web Interface
+Navigate to `http://127.0.0.1:5000/analyze` to analyze a URL or upload a PDF for SDG classification.
+
+## Troubleshooting
+- Ensure MySQL credentials are correct.
+- Check if the required Python packages are installed.
+- Verify OpenAI API key is correctly set.
+- Use `flask run --debug` for detailed error logs.
+
+## Notes
+- This project utilizes OpenAI for text classification and KeyBERT for keyword extraction.
+- Ensure ethical and compliant use of OpenAI APIs.
+
